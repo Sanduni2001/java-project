@@ -10,20 +10,18 @@
 <script src="https://cdn.jsdelivr.net/npm/@material-tailwind/html@latest/dist/material-tailwind.min.js"></script>
 
 
+
 <nav>
     <jsp:include page="/components/navbar.jsp" />
-
 </nav>
 
-<div class="mx-10">
-
-    <jsp:include page="/WEB-INF/login.jsp" />
-
+<div>
+    <jsp:include page="/components/carousal.jsp" />
 </div>
 
-
-
-
+<footer>
+    <jsp:include page="/components/footer.jsp" />
+</footer>
 
 </body>
 </html>
