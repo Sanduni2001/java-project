@@ -12,14 +12,15 @@
 
 <nav>
     <jsp:include page="/components/navbar.jsp" />
-
 </nav>
 
-<div class="mx-10">
-
-
-
+<div>
+    <jsp:include page="/components/carousal.jsp" />
 </div>
+
+<footer>
+    <jsp:include page="/components/footer.jsp" />
+</footer>
 
 
 
