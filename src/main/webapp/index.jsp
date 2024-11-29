@@ -15,10 +15,11 @@
 
 </nav>
 
-<div class="mx-10">
-
-
-
+<div>
+    <jsp:include page="/components/carousal.jsp" />
+</div>
+<div>
+    <jsp:include page="/components/footer.jsp" />
 </div>
 
 
