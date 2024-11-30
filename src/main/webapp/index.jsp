@@ -19,6 +19,10 @@
     <jsp:include page="/components/carousal.jsp" />
 </div>
 
+<div>
+    <jsp:include page="/components/now_showing.jsp" />
+</div>
+
 <footer>
     <jsp:include page="/components/footer.jsp" />
 </footer>
