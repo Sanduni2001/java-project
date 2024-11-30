@@ -19,7 +19,7 @@
 
             <!-- Login Button -->
             <div class="hidden sm:flex">
-                <a href="#" class="text-gray-300 hover:bg-blue-800 hover:text-white px-3 py-2 rounded-md text-sm font-medium bg-blue-500">
+                <a href="login.jsp" class="text-gray-300 hover:bg-blue-800 hover:text-white px-3 py-2 rounded-md text-sm font-medium bg-blue-500">
                     Login
                 </a>
             </div>
