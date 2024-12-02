@@ -22,6 +22,9 @@
 <div>
     <jsp:include page="/components/now_showing.jsp" />
 </div>
+<div>
+    <jsp:include page="/components/comming_soon.jsp" />
+</div>
 
 <footer>
     <jsp:include page="/components/footer.jsp" />
