@@ -6,13 +6,16 @@
     <title>Signup</title>
 </head>
 <body>
-<script src="https://cdn.jsdelivr.net/npm/@material-tailwind/html@latest/dist/material-tailwind.min.js"></script>
+<nav>
+<jsp:include page="/components/navbar.jsp" />
+</nav>
+<script src="#"></script>
 
-<div class="flex items-center justify-center min-h-screen bg-gray-100">
+<div class="flex items-center justify-center min-h-screen bg-[#FFFFFF]">
     <div class="w-full max-w-md bg-white shadow-lg rounded-lg p-8">
-        <h1 class="text-2xl font-semibold text-center text-gray-800 mb-6">Sign In</h1>
+        <h1 class="text-2xl font-semibold text-center text-gray-800 mb-6">Sign Up</h1>
         <form action="#">
-            <!-- Name Input -->
+
             <div class="mb-4">
                 <input
                         type="text"
@@ -21,7 +24,7 @@
                 />
             </div>
 
-            <!-- Email Input -->
+
             <div class="mb-4">
                 <input
                         type="email"
@@ -30,7 +33,7 @@
                 />
             </div>
 
-            <!-- Password Input -->
+
             <div class="mb-4">
                 <input
                         type="password"
@@ -39,7 +42,7 @@
                 />
             </div>
 
-            <!-- Submit Button -->
+
             <button
                     type="submit"
                     class="w-full px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -48,7 +51,7 @@
             </button>
         </form>
 
-        <!-- Already have an account -->
+
         <div class="text-center mt-4">
             <p class="text-sm text-gray-600">
                 Already have an Account?
@@ -56,13 +59,13 @@
             </p>
         </div>
 
-        <!-- Sign up with Google -->
+
         <button
                 type="button"
-                class="flex items-center justify-center w-full mt-6 px-4 py-2 text-sm text-gray-800 bg-black rounded-lg hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-800"
+                class="flex items-center justify-center w-full mt-6 px-4 py-2 text-sm text-white bg-gray-600 rounded-lg hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-800"
         >
             <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
+                    src="./assets/logos/google.png"
                     alt="Google"
                     class="w-5 h-5 mr-2"
             />
@@ -70,6 +73,8 @@
         </button>
     </div>
 </div>
-
+<footer>
+<jsp:include page="/components/footer.jsp" />
+</footer>
 </body>
 </html>
