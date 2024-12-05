@@ -8,6 +8,10 @@
 <body>
 <script src="https://cdn.jsdelivr.net/npm/@material-tailwind/html@latest/dist/material-tailwind.min.js"></script>
 
+<nav>
+    <jsp:include page="/components/navbar.jsp" />
+</nav>
+
 <div class="flex items-center justify-center min-h-screen bg-gray-100">
     <!-- Login Form Container -->
     <div class="flex flex-col md:flex-row shadow-lg bg-white rounded-lg overflow-hidden w-full max-w-4xl">
@@ -67,6 +71,9 @@
     </div>
 </div>
 
+<footer>
+    <jsp:include page="/components/footer.jsp" />
+</footer>
 
 </body>
 </html>
