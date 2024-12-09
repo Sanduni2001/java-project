@@ -39,13 +39,7 @@
                     />
                 </div>
                 <div class="flex items-center justify-between mb-4">
-                    <label class="flex items-center text-sm text-gray-600">
-                        <input
-                                type="checkbox"
-                                class="mr-2 border-gray-300 rounded focus:ring-blue-500"
-                        />
-                        Remember Me
-                    </label>
+
                     <a href="#" class="text-sm text-blue-500 hover:underline">Forgot Password?</a>
                 </div>
                 <button
