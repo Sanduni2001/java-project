@@ -673,6 +673,10 @@ video {
     min-width: 200px;
 }
 
+.min-h-\[calc\(100vh-120px\)\] {
+    min-height: calc(100vh - 120px);
+}
+
 .max-w-\[1440px\] {
     max-width: 1440px;
 }
