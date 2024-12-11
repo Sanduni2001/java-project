@@ -13,9 +13,9 @@
 </nav>
 
 <div class="flex items-center justify-center min-h-screen bg-gray-100">
-    <!-- Login Form Container -->
+
     <div class="flex flex-col md:flex-row shadow-lg bg-white rounded-lg overflow-hidden w-full max-w-4xl">
-        <!-- Left Section -->
+
         <div class="w-full md:w-2/3 p-8">
             <h2 class="text-2xl font-semibold text-gray-700">Welcome Back</h2>
             <p class="text-sm text-gray-500 mb-4">Sign in to your account</p>
@@ -44,15 +44,15 @@
                 </div>
                 <button
                         type="submit"
-                        class="w-full px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+                        class="w-full px-4 py-2 text-white bg-[#1F2B47] rounded-lg hover:bg-[#172139] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
                 >
                     Sign In
                 </button>
             </form>
         </div>
 
-        <!-- Right Section -->
-        <div class="w-full md:w-1/3 bg-blue-800 text-white p-6 flex flex-col justify-center items-center">
+
+        <div class="w-full md:w-1/3 bg-[#1F2B47] text-white p-6 flex flex-col justify-center items-center">
             <h2 class="text-lg font-bold">Welcome to login</h2>
             <p class="text-sm mt-2">Don't have an account?</p>
             <a

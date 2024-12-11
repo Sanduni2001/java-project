@@ -14,7 +14,7 @@
 
         <div class="flex justify-center mb-4">
             <img
-                src="https://upload.wikimedia.org/wikipedia/en/7/76/Kungfupanda.jpg"
+                src="./assets/images/cs2.png"
                 alt="Kung Fu Panda"
                 class="w-40 h-56 rounded-lg shadow-md"
             />
