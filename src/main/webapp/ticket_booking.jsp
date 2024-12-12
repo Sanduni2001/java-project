@@ -118,12 +118,14 @@
                 </div>
 
                 <!-- Submit Button -->
+                <a href="myticket.jsp" >
                 <button
                         id="bookNow"
                         class="w-full bg-[#2563EB] max-w-[615px] text-white py-2 px-4 rounded-md hover:bg-[#2563EB] focus:outline-none focus:ring focus:ring-bg-[#2563EB]"
                 >
                     Book Now
                 </button>
+                </a>
             </div>
         </div>
     </div>

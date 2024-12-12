@@ -6,8 +6,16 @@
     <title>My Tickets</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-    <div class="bg-white shadow-lg rounded-lg p-6 max-w-md w-full">
+
+<body class="bg-gray-100  min-h-screen">
+<div>
+    <nav>
+        <jsp:include page="/components/navbar.jsp" />
+    </nav>
+</div>
+
+
+    <div class="bg-white shadow-lg rounded-lg p-6 max-w-md w-full mx-auto">
 
         <h1 class="text-xl font-bold text-center mb-6">My Tickets</h1>
 
@@ -62,13 +70,23 @@
             <p class="text-sm text-gray-700 font-medium mb-4">Movie Name - <span class="font-bold">KUNG FU PANDA</span></p>
 
 
-            <button
-                type="submit"
+
+            <a href="payment.jsp">
+                <button
+                type="button"
                 class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-                Continue
+                     Continue
             </button>
+            </a>
+
         </form>
     </div>
+
+    <footer>
+        <jsp:include page="/components/footer.jsp" />
+    </footer>
+
 </body>
+
 </html>
