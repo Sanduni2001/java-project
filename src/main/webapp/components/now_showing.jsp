@@ -191,7 +191,7 @@
         <h2 id="popup-title" class="text-2xl font-bold mb-4 text-black"></h2>
         <p id="popup-description" class="text-gray-700 mb-6"></p>
         <button class="rounded bg-red-500 py-2 px-4 text-white hover:bg-red-600 ml-20" onclick="closePopup()">Close</button>
-        <button class="rounded bg-gray-800 py-2 px-4 text-white hover:bg-[#000000] ml-6" onclick="closePopup()">Booking</button>
+       <a href="ticket_booking.jsp"><button class="rounded bg-gray-800 py-2 px-4 text-white hover:bg-[#000000] ml-6" onclick="closePopup()">Booking</button></a>
 
     </div>
 </div>

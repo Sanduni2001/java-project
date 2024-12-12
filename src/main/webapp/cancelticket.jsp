@@ -33,9 +33,9 @@
     <div class="mb-6">
         <h2 class="block text-sm font-bold font-medium text-gray-700 mb-2">Your Booking</h2>
         <div class="bg-gray-100 p-4 rounded-lg">
-            <p class="text-sm text-gray-700 mb-2"><strong>Movie:</strong> </p>
-            <p class="text-sm text-gray-700 mb-2"><strong>Show Time:</strong> </p>
-            <p class="text-sm text-gray-700"><strong>Total Amount:</strong> </p>
+            <p class="text-sm text-gray-700 mb-2"><strong>Movie`:</strong> KUNG FU PANDA</p>
+            <p class="text-sm text-gray-700 mb-2"><strong>Show Time:</strong> 9.00 AM</p>
+            <p class="text-sm text-gray-700"><strong>Total Amount:</strong> LKR 1000 </p>
         </div>
     </div>
 
