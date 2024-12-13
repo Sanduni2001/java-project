@@ -14,42 +14,17 @@
             </div>
 
             <div class="hidden sm:flex">
+                <a href="cancelticket.jsp" class="flex items-center">
+                    <img class="h-8 w-auto" src="./assets/logos/cart.png" alt="Your Company">
+                    <span class="text-white text-lg font-semibold ml-2"></span>
+                </a>
                 <!-- Trigger Image -->
-                <a href="#" class="flex items-center" id="trigger-popup">
+                <a href="dashboard2.jsp" class="flex items-center">
                     <img class="h-8 w-auto" src="./assets/logos/user.png" alt="Your Company">
                     <span class="text-white text-lg font-semibold ml-2"></span>
                 </a>
 
-                <!-- Popup Overlay -->
-                <div
-                        id="popup-overlay"
-                        class="fixed inset-0 bg-gray-800 bg-opacity-50 hidden z-40"
-                ></div>
 
-                <!-- Popup Window -->
-                <div
-                        id="popup"
-                        class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-6 w-80 z-50"
-                >
-                    <div class="space-y-4">
-                        <!-- Admin Button -->
-                        <a
-                                href="dashboard2.jsp"
-                                class="block w-full text-center bg-gray-600 text-white py-2 rounded-lg hover:bg-gray-700"
-                        >
-                            Admin
-                        </a>
-                        <br>
-                        <!-- User Button -->
-                        <a href="cancelticket.jsp"><button
-                                id="user-btn"
-                                class="w-full bg-gray-600 text-white py-2 rounded-lg hover:bg-gray-700"
-                        >
-                            Tickets
-                        </button>
-                        </a>
-                    </div>
-                </div>
 
                 <a href="login.jsp" class="text-gray-300 hover:bg-blue-800 hover:text-white px-3 py-2 rounded-md text-sm font-medium bg-blue-500">
                     Login
@@ -81,29 +56,3 @@
 </nav>
 
 <!-- JavaScript -->
-<script>
-    // Get elements
-    const triggerPopup = document.getElementById("trigger-popup");
-    const popup = document.getElementById("popup");
-    const overlay = document.getElementById("popup-overlay");
-    const userBtn = document.getElementById("user-btn");
-
-    // Open popup
-    triggerPopup.addEventListener("click", (e) => {
-        e.preventDefault(); // Prevent default anchor behavior
-        popup.classList.remove("hidden");
-        overlay.classList.remove("hidden");
-    });
-
-    // Close popup when User button is clicked
-    userBtn.addEventListener("click", () => {
-        popup.classList.add("hidden");
-        overlay.classList.add("hidden");
-    });
-
-    // Close popup when overlay is clicked
-    overlay.addEventListener("click", () => {
-        popup.classList.add("hidden");
-        overlay.classList.add("hidden");
-    });
-</script>
