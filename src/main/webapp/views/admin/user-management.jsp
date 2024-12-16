@@ -1,5 +1,4 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,31 +15,38 @@
 
     <%-- Content Section --%>
     <div class="w-full md:w-3/4 p-6 bg-white overflow-auto">
-        <h1 class="text-2xl font-bold mb-6 text-center">User Management</h1>
+        <h1 class="text-3xl font-bold mb-6 text-center">User Management</h1>
 
-        <table class="table-auto w-full border-collapse border border-gray-300">
-            <thead>
-            <tr class="bg-gray-200">
-                <th class="border border-gray-300 px-4 py-2">ID</th>
-                <th class="border border-gray-300 px-4 py-2">Username</th>
-                <th class="border border-gray-300 px-4 py-2">Email</th>
-                <th class="border border-gray-300 px-4 py-2">Mobile</th>
-                <th class="border border-gray-300 px-4 py-2">Role</th>
-                <th class="border border-gray-300 px-4 py-2">Status</th>
-            </tr>
-            </thead>
-            <tbody>
-            <%-- Check if there are users --%>
-            <c:choose>
-                <c:when test="${not empty clients}">
-                    <c:forEach var="user" items="${clients}">
-                        <tr class="hover:bg-gray-100">
-                            <td class="border border-gray-300 px-4 py-2 text-center">${user.id}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-center">${user.username}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-center">${user.email}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-center">${user.mobile}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-center">${user.role}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-center">
+        <%-- No Users Message --%>
+        <c:if test="${empty clients}">
+            <div class="bg-gray-100 p-6 rounded-lg shadow-md text-center">
+                <p class="text-gray-600 text-lg">No users found.</p>
+            </div>
+        </c:if>
+
+        <%-- Users Table Section --%>
+        <c:if test="${not empty clients}">
+            <div class="bg-white shadow-md rounded-lg overflow-hidden overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-100 border-b-2 border-gray-200">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mobile</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                    <c:forEach var="user" items="${clients}" varStatus="status">
+                        <tr class="hover:bg-gray-50 transition duration-200 ${status.index % 2 == 0 ? 'bg-white' : 'bg-gray-50'}">
+                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">${status.index + 1}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">${user.username}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">${user.email}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">${user.mobile}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">${user.role}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                                 <c:choose>
                                     <c:when test="${user.isActive}">
                                         <span class="text-green-500">Active</span>
@@ -48,22 +54,14 @@
                                     <c:otherwise>
                                         <span class="text-red-500">Inactive</span>
                                     </c:otherwise>
-
                                 </c:choose>
                             </td>
-                        </tr>
+                           </tr>
                     </c:forEach>
-                </c:when>
-                <c:otherwise>
-                    <tr>
-                        <td colspan="6" class="text-center border border-gray-300 px-4 py-2">
-                            No users found.
-                        </td>
-                    </tr>
-                </c:otherwise>
-            </c:choose>
-            </tbody>
-        </table>
+                    </tbody>
+                </table>
+            </div>
+        </c:if>
     </div>
 </div>
 

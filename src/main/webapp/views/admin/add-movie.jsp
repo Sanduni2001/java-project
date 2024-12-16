@@ -1,5 +1,5 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,11 +42,20 @@
             </div>
 
             <div class="mb-4">
+                <label for="musicBy" class="block font-bold text-gray-700">Music By</label>
+                <input type="text" id="musicBy" name="musicBy" class="w-full border rounded px-4 py-2" placeholder="Enter composer's name" required>
+            </div>
+
+            <div class="mb-4">
+                <label for="produceBy" class="block font-bold text-gray-700">Produced By</label>
+                <input type="text" id="produceBy" name="produceBy" class="w-full border rounded px-4 py-2" placeholder="Enter producer's name" required>
+            </div>
+
+            <div class="mb-4">
                 <label for="ticketPrice" class="block font-bold text-gray-700">Ticket Price</label>
                 <input type="number" id="ticketPrice" name="ticketPrice" class="w-full border rounded px-4 py-2" placeholder="Enter ticket price" required>
             </div>
 
-            <%-- Dropdown for Movie Status --%>
             <div class="mb-4">
                 <label for="movieStatus" class="block font-bold text-gray-700">Movie Status</label>
                 <select id="movieStatus" name="movieStatus" class="w-full border rounded px-4 py-2" required>

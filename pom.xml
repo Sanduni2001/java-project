@@ -1,12 +1,11 @@
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.example</groupId>
-  <artifactId>Java_Project</artifactId>
-  <packaging>war</packaging>
+  <artifactId>movie-booking</artifactId>
   <version>1.0-SNAPSHOT</version>
+  <packaging>war</packaging>
 
   <name>Java_Project Maven Webapp</name>
   <url>http://maven.apache.org</url>
@@ -54,18 +53,17 @@
       <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
       <version>2.0.0</version>
     </dependency>
-
     <dependency>
       <groupId>org.glassfish.web</groupId>
       <artifactId>jakarta.servlet.jsp.jstl</artifactId>
       <version>2.0.0</version>
     </dependency>
 
+
   </dependencies>
 
   <build>
     <finalName>Java_Project</finalName>
-
     <plugins>
       <!-- Maven Compiler Plugin -->
       <plugin>
@@ -77,7 +75,6 @@
           <target>${maven.compiler.target}</target>
         </configuration>
       </plugin>
-
       <!-- Maven WAR Plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -87,8 +84,6 @@
           <failOnMissingWebXml>false</failOnMissingWebXml>
         </configuration>
       </plugin>
-
     </plugins>
-
   </build>
 </project>

@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,6 +7,13 @@
     <link rel="stylesheet" href="/css/style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Sign In</title>
+    <style>
+        .error {
+            color: red;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+    </style>
 </head>
 <body class="bg-gray-100">
 
@@ -13,7 +21,7 @@
 <nav class="bg-[#070315] text-white py-3 shadow-lg">
     <div class="container mx-auto flex justify-between items-center">
         <div class="text-xl font-bold">ABC Cinema</div>
-        <a href="#" class="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none">Back</a>
+        <a href="<%= request.getContextPath() %>/home" class="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none">Back</a>
     </div>
 </nav>
 
@@ -25,6 +33,13 @@
         <div id="loginForm" class="w-full md:w-2/3 p-8">
             <h2 class="text-2xl font-semibold text-gray-700">Welcome Back</h2>
             <p class="text-sm text-gray-500 mb-4">Sign in to your account</p>
+
+            <!-- Error Message -->
+            <c:if test="${not empty error}">
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative mb-4">
+                    <strong class="font-bold">Error:</strong> <span>${error}</span>
+                </div>
+            </c:if>
 
             <!-- Login Form -->
             <form id="loginFormElement" action="login" method="post">

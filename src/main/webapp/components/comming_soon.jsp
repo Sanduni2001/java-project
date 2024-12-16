@@ -8,8 +8,7 @@
 </head>
 <body class="bg-gray-100">
 <div class="container mx-auto mt-10">
-    <h1 class="text-3xl font-bold mb-6 text-left ml-20 text-black">Coming Soon</h1>
-
+    <h2 class="text-3xl font-bold text-gray-800 text-center mb-6">Coming Soon</h2>
     <div class="relative flex justify-center">
 
         <button id="prev" class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-200 text-black p-2 rounded-full shadow hover:bg-gray-400 disabled:opacity-50" disabled>

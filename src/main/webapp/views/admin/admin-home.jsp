@@ -68,11 +68,11 @@
                                 <div class="text-sm font-medium text-gray-900">${movie.movieName}</div>
                             </td>
                             <td class="px-4 py-4 text-center">
-                                <img src="${pageContext.request.contextPath}/uploadsImg/${movie.image}"
+                                <img src="${pageContext.request.contextPath}/DBImages/${movie.image}"
                                      alt="Movie Poster"
                                      class="w-16 h-24 object-cover rounded-md mx-auto shadow-md">
-
                             </td>
+
 
                             <td class="px-4 py-4 text-right text-sm text-gray-600">
                                 $${movie.ticketPrice}

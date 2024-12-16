@@ -7,13 +7,10 @@
                    class="block py-2 px-4 text-lg font-semibold hover:bg-gray-700 rounded-lg">Home</a>
             </li>
             <li>
-                <a href="#" onclick="loadPage('admin-nowshowing.jsp')"
+                <a href="${pageContext.request.contextPath}/admin/bookings"
                    class="block py-2 px-4 text-lg font-semibold hover:bg-gray-700 rounded-lg">Bookings</a>
             </li>
-            <li>
-                <a href="#" onclick="loadPage('admin-comingsoon.jsp')"
-                   class="block py-2 px-4 text-lg font-semibold hover:bg-gray-700 rounded-lg">Payments</a>
-            </li>
+
             <li>
                 <a href="${pageContext.request.contextPath}/admin/user-management"
                    class="block py-2 px-4 text-lg font-semibold hover:bg-gray-700 rounded-lg">Users</a>
@@ -22,11 +19,19 @@
                 <a href="${pageContext.request.contextPath}/admin/admin-management"
                    class="block py-2 px-4 text-lg font-semibold hover:bg-gray-700 rounded-lg">Admins</a>
             </li>
+            <li>
+                <a href="${pageContext.request.contextPath}/admin/manage-reviews"
+                   class="block py-2 px-4 text-lg font-semibold hover:bg-gray-700 rounded-lg">Reviews</a>
+            </li>
+            <li>
+                <a href="#" onclick="loadPage('admin-comingsoon.jsp')"
+                   class="block py-2 px-4 text-lg font-semibold hover:bg-gray-700 rounded-lg">Payments</a>
+            </li>
         </ul>
     </div>
     <div class="p-4">
         <a href="${pageContext.request.contextPath}/logout" class="block py-2 px-4 text-lg font-semibold hover:bg-gray-700 rounded-lg">
-            Logout
+          Logout
         </a>
     </div>
 </aside>

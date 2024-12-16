@@ -144,11 +144,14 @@ public class AuthController extends HttpServlet {
                 return;
             }
 
-            // Create session and store user info
-            HttpSession session = request.getSession(true);
-            session.setAttribute("user", user);
-            session.setAttribute("username", user.getUsername());
-            session.setAttribute("userRole", user.getRole()); // Store role for role-based redirects
+
+
+// Create session and store user info
+            HttpSession session = request.getSession(true); // Create a new session or use existing
+            session.setAttribute("userId", user.getId());  // Store user ID
+            session.setAttribute("username", user.getUsername());  // Store username
+            session.setAttribute("userRole", user.getRole());  // Store user role for role-based access
+
 
             // Set session timeout to 1 hour (3600 seconds)
             session.setMaxInactiveInterval(3600);

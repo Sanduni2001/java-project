@@ -29,6 +29,7 @@ public class MovieManagementController extends HttpServlet {
 
     private final MovieManagementService movieService = new MovieManagementService();
 
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
@@ -82,6 +83,8 @@ public class MovieManagementController extends HttpServlet {
         dispatcher.forward(request, response);
     }
 
+    private static final String UPLOAD_PATH = "/Users/kavindu/Developer/Projects/movie-booking/src/main/webapp/DBImages/";
+
     private void addMovie(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String movieName = request.getParameter("movieName");
         String description = request.getParameter("description");
@@ -91,7 +94,9 @@ public class MovieManagementController extends HttpServlet {
         String produceBy = request.getParameter("produceBy");
         String movieStatus = request.getParameter("movieStatus");
         double ticketPrice = 0;
-        String imagePath = "/images/default_movie.png"; // Initialize with the default image
+        String imagePath = "/images/default_movie.png"; // Default image path
+
+        // Validate ticket price
         try {
             ticketPrice = Double.parseDouble(request.getParameter("ticketPrice"));
         } catch (NumberFormatException e) {
@@ -100,18 +105,43 @@ public class MovieManagementController extends HttpServlet {
             return;
         }
 
+        // Handle image upload
+        Part filePart = request.getPart("image");
+        String imageFileName = "default_movie.png"; // Default file name
+        if (filePart != null && filePart.getSize() > 0) {
+            // Extract file name
+            imageFileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+            File uploadDir = new File(UPLOAD_PATH);
 
-        try {
-            imagePath = uploadImage(request);
-        } catch (IOException | ServletException e) {
-            request.setAttribute("error", "Error uploading image: " + e.getMessage());
-            forwardToPage(request, response, "/views/admin/add-movie.jsp");
-            return;
+            // Ensure upload directory exists
+            if (!uploadDir.exists()) {
+                boolean created = uploadDir.mkdirs();
+                if (!created) {
+                    throw new IOException("Failed to create upload directory: " + UPLOAD_PATH);
+                }
+            }
+
+            // Save file to the upload path
+            String imageFilePath = UPLOAD_PATH + File.separator + imageFileName;
+            try (InputStream inputStream = filePart.getInputStream();
+                 FileOutputStream outputStream = new FileOutputStream(imageFilePath)) {
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+            } catch (IOException e) {
+                request.setAttribute("error", "Error uploading image: " + e.getMessage());
+                forwardToPage(request, response, "/views/admin/add-movie.jsp");
+                return;
+            }
+
+            // Update imagePath with the uploaded file path relative to the web app
+            imagePath = imageFileName;
         }
 
-
+        // Create and add the movie
         Movie movie = new Movie(0, movieName, description, releaseDate, directorName, musicBy, produceBy, ticketPrice, imagePath, movieStatus);
-
         if (movieService.addMovie(movie)) {
             response.sendRedirect(request.getContextPath() + "/admin/movie-management?action=addDatesTimes&movieId=" + movie.getMovieId());
         } else {
@@ -120,35 +150,6 @@ public class MovieManagementController extends HttpServlet {
         }
     }
 
-    private String uploadImage(HttpServletRequest request) throws IOException, ServletException {
-        Part filePart = request.getPart("image");
-        if (filePart == null || filePart.getSize() == 0) {
-            return "/images/default_movie.png"; // Return a default image path if no file is uploaded
-        }
-
-        String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-        String uploadPath = request.getServletContext().getRealPath("/") + "uploadsImg";
-
-        File uploadDir = new File(uploadPath);
-        if (!uploadDir.exists()) {
-            uploadDir.mkdirs(); // Make sure the directory exists
-        }
-
-        String filePath = uploadPath + File.separator + fileName;
-        try (InputStream inputStream = filePart.getInputStream();
-             FileOutputStream outputStream = new FileOutputStream(filePath)) {
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
-            }
-        } catch (IOException e) {
-            System.err.println("Error uploading file: " + e.getMessage());
-            throw e; // Re-throw the exception to be handled by calling method
-        }
-
-        return  fileName;
-    }
 
 
     private void handleAddDatesTimes(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -209,7 +210,7 @@ public class MovieManagementController extends HttpServlet {
             for (String time : selectedTimes) {
                 String convertedTime = convertTo24HourFormat(time);
                 if (convertedTime != null) {
-                    ShowTime showTimeObj = new ShowTime(0, showDateObj.getShowDateId(), convertedTime);
+                    ShowTime showTimeObj = new ShowTime(0,movieId, showDateObj.getShowDateId(), convertedTime);
                     movieService.addShowTime(showTimeObj);
                 }
             }
@@ -285,7 +286,7 @@ public class MovieManagementController extends HttpServlet {
             for (String time : selectedTimes) {
                 String convertedTime = convertTo24HourFormat(time);
                 if (convertedTime != null) {
-                    ShowTime showTimeObj = new ShowTime(0, showDateObj.getShowDateId(), convertedTime);
+                    ShowTime showTimeObj = new ShowTime(0, movieId,showDateObj.getShowDateId(), convertedTime);
                     movieService.addShowTime(showTimeObj);
                 }
             }
