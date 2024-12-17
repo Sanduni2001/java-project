@@ -111,7 +111,7 @@ public class BookingServlet extends HttpServlet {
                 Movie movie = movieService.getMovieById(movieId);
                 String movieName = movie.getMovieName();
                 emailService.sendBookingConfirmationEmail(email, movieName);
-                response.sendRedirect(request.getContextPath() + "/views/client/booking-success.jsp");
+                response.sendRedirect(request.getContextPath() + "/pay-now");
             } else {
                 request.setAttribute("error", "Failed to create booking.");
                 request.getRequestDispatcher("/error.jsp").forward(request, response);
