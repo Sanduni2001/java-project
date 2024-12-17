@@ -31,7 +31,7 @@
             <div class="flex flex-col md:flex-row">
                     <%-- Movie Image --%>
                 <div class="md:flex-shrink-0">
-                    <img src="${pageContext.request.contextPath}/uploadsImg/${movie.image}" alt="${movie.movieName}" class="rounded-lg w-full md:w-56 h-auto object-cover shadow-lg">
+                    <img src="${pageContext.request.contextPath}/DBImages/${movie.image}" alt="${movie.movieName}" class="rounded-lg w-full md:w-56 h-auto object-cover shadow-lg">
                 </div>
 
                     <%-- Movie and Booking Details --%>

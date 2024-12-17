@@ -12,7 +12,7 @@ public class VerificationCodeService {
 
     // Add a new verification code
     public boolean addVerificationCode(int userId, String code, LocalDateTime expiresAt) {
-        String query = "INSERT INTO VerificationCode (userID, code, createdAt, expiresAt, isUsed) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO VerificationCode (userId, code, createdAt, expiresAt, isUsed) VALUES (?, ?, ?, ?, ?)";
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
@@ -31,7 +31,7 @@ public class VerificationCodeService {
 
     // Mark a verification code as used
     public boolean markCodeAsUsed(int userId, String code) {
-        String query = "UPDATE VerificationCode SET isUsed = ? WHERE userID = ? AND code = ?";
+        String query = "UPDATE VerificationCode SET isUsed = ? WHERE userId = ? AND code = ?";
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
@@ -48,7 +48,7 @@ public class VerificationCodeService {
 
     // Get a verification code for a specific user and code value
     public Optional<VerificationCode> getVerificationCode(int userId, String code) {
-        String query = "SELECT * FROM VerificationCode WHERE userID = ? AND code = ?";
+        String query = "SELECT * FROM VerificationCode WHERE userId = ? AND code = ?";
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
@@ -60,7 +60,7 @@ public class VerificationCodeService {
             if (resultSet.next()) {
                 VerificationCode verificationCode = new VerificationCode(
                         resultSet.getInt("id"),
-                        resultSet.getInt("userID"),
+                        resultSet.getInt("userId"),
                         resultSet.getString("code"),
                         resultSet.getTimestamp("createdAt").toLocalDateTime(),
                         resultSet.getTimestamp("expiresAt").toLocalDateTime(),
@@ -77,7 +77,6 @@ public class VerificationCodeService {
     // Verify if a code is valid (not expired and not used)
     public boolean verifyCode(int userId, String code) {
         Optional<VerificationCode> optionalCode = getVerificationCode(userId, code);
-
         if (optionalCode.isPresent()) {
             VerificationCode verificationCode = optionalCode.get();
             // Check if the code is not expired and not used
@@ -85,5 +84,6 @@ public class VerificationCodeService {
         }
         return false;
     }
+
 }
 

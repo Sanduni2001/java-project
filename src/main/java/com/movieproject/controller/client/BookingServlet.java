@@ -1,11 +1,10 @@
 package com.movieproject.controller.client;
 
-import com.movieproject.model.Booking;
-import com.movieproject.model.Movie;
-import com.movieproject.model.ShowDate;
-import com.movieproject.model.ShowTime;
+import com.movieproject.model.*;
 import com.movieproject.service.BookingService;
+import com.movieproject.service.EmailService;
 import com.movieproject.service.MovieManagementService;
+import com.movieproject.service.UserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -20,6 +19,8 @@ import java.util.List;
 public class BookingServlet extends HttpServlet {
     private final MovieManagementService movieService = new MovieManagementService();
     private final BookingService bookingService = new BookingService();
+    private  final EmailService emailService = new EmailService();
+    private  final UserService userService = new UserService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -50,7 +51,7 @@ public class BookingServlet extends HttpServlet {
             case "delete":
                 deleteBooking(request, response);
                 break;
-            case "details":
+            case "booking":
                 handleDetails(request, response);
                 break;
             default:
@@ -105,6 +106,11 @@ public class BookingServlet extends HttpServlet {
             // Save booking
             if (bookingService.createBooking(booking)) {
                 request.getSession().setAttribute("success", "Booking successful!");
+                User user = userService.getUserById(userId);
+                String email = user.getEmail();
+                Movie movie = movieService.getMovieById(movieId);
+                String movieName = movie.getMovieName();
+                emailService.sendBookingConfirmationEmail(email, movieName);
                 response.sendRedirect(request.getContextPath() + "/views/client/booking-success.jsp");
             } else {
                 request.setAttribute("error", "Failed to create booking.");
@@ -189,7 +195,19 @@ public class BookingServlet extends HttpServlet {
     }
 
     private void deleteBooking(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        HttpSession session = request.getSession(false);
+
         try {
+            // Step 1: Verify session and user ID
+            if (session == null || session.getAttribute("userId") == null) {
+                response.sendRedirect(request.getContextPath() + "/auth/login.jsp");
+                return;
+            }
+
+            int userId = (Integer) session.getAttribute("userId");
+            System.out.println("User ID from session: " + userId);
+
+            // Step 2: Retrieve and validate the booking ID from request
             String bookingIdParam = request.getParameter("bookingId");
             if (bookingIdParam == null || bookingIdParam.isEmpty()) {
                 response.sendRedirect(request.getContextPath() + "/error.jsp?message=Invalid Booking ID");
@@ -197,17 +215,53 @@ public class BookingServlet extends HttpServlet {
             }
 
             int bookingId = Integer.parseInt(bookingIdParam);
+            System.out.println("Booking ID to delete: " + bookingId);
 
+            // Step 3: Fetch booking details before deletion
+            Booking booking = bookingService.getBookingById(bookingId);
+            if (booking == null) {
+                System.out.println("Booking not found for ID: " + bookingId);
+                response.sendRedirect(request.getContextPath() + "/error.jsp?message=Booking not found");
+                return;
+            }
+
+            // Fetch movie details
+            Movie movie = movieService.getMovieById(booking.getMovieId());
+            String movieName = (movie != null) ? movie.getMovieName() : "Unknown Movie";
+            System.out.println("Movie Name: " + movieName);
+
+            // Step 4: Delete the booking
             if (bookingService.deleteBooking(bookingId)) {
-                response.sendRedirect(request.getContextPath() + "/booking?action=my-booking");
+                // Fetch user email
+                User user = userService.getUserById(userId);
+                if (user == null) {
+                    System.out.println("User not found for ID: " + userId);
+                    response.sendRedirect(request.getContextPath() + "/error.jsp?message=User not found");
+                    return;
+                }
+
+                String email = user.getEmail();
+                System.out.println("User Email: " + email);
+
+                // Step 5: Send cancellation email
+                emailService.sendBookingCancellationEmail(email, movieName);
+                System.out.println("Booking cancellation email sent successfully to " + email);
+
+                // Redirect to "my-booking" page
+                response.sendRedirect(request.getContextPath() + "/booking?action=my-booking&message=Booking deleted successfully");
             } else {
+                System.out.println("Failed to delete booking with ID: " + bookingId);
                 response.sendRedirect(request.getContextPath() + "/error.jsp?message=Unable to delete booking");
             }
+
         } catch (NumberFormatException e) {
+            System.out.println("Invalid Booking ID format.");
             response.sendRedirect(request.getContextPath() + "/error.jsp?message=Invalid Booking ID Format");
         } catch (Exception e) {
-            response.sendRedirect(request.getContextPath() + "/error.jsp?message=Unexpected Error");
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/error.jsp?message=Unexpected Error Occurred");
         }
     }
+
 
 }

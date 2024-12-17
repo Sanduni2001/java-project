@@ -8,6 +8,16 @@ public class Booking {
     private String showTime;    // Time of the show (formatted as String, e.g., "18:00")
     private int numberOfSeats;  // Number of seats booked
     private double totalPrice;  // Total price for the booking
+    private String status; // e.g., "Pending", "Paid", "Canceled"
+
+    // Getters and Setters
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     // Default constructor (necessary for frameworks like Hibernate, JSON parsing, etc.)
     public Booking() {

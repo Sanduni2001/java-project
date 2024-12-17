@@ -66,7 +66,7 @@
                         <h3 class="text-xl font-semibold text-gray-800 mb-3">${showDate.showDate}</h3>
                         <div class="space-y-2">
                             <c:forEach items="${showDate.showTimes}" var="showTime">
-                                <a href="${pageContext.request.contextPath}/booking?action=details&movieId=${movie.movieId}&showTimeId=${showTime.showTimeId}&showDateId=${showDate.showDateId}"
+                                <a href="${pageContext.request.contextPath}/booking?action=booking&movieId=${movie.movieId}&showTimeId=${showTime.showTimeId}&showDateId=${showDate.showDateId}"
                                    class="block py-2 px-3 bg-gray-100 rounded-md hover:bg-blue-50 transition duration-200">
                                         ${showTime.showTime}
                                 </a>

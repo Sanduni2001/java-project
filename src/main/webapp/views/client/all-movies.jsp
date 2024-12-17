@@ -33,7 +33,7 @@
                 <!-- Movie Image -->
                 <div class="h-96 w-72 rounded-lg overflow-hidden">
                     <img class="h-full w-full object-cover transition-transform duration-500 ease-in-out"
-                         src="${pageContext.request.contextPath}/uploadsImg/${movie.image}" alt="${movie.movieName}" />
+                         src="${pageContext.request.contextPath}/DBImages/${movie.image}" alt="${movie.movieName}" />
                 </div>
 
                 <!-- Overlay and Text -->

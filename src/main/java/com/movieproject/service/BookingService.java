@@ -16,6 +16,7 @@ public class BookingService {
     public boolean createBooking(Booking booking) {
         String query = "INSERT INTO Bookings (userId, movieId, showDate, showTime, numberOfSeats, totalPrice) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
+
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
@@ -115,6 +116,23 @@ public class BookingService {
         }
         return false;
     }
+
+//    public boolean updateBookingStatus(int bookingId, String status) {
+//        String query = "UPDATE Bookings SET status = ? WHERE order_id = ?";
+//        try (Connection conn = DBConnection.getConnection();
+//             PreparedStatement stmt = conn.prepareStatement(query)) {
+//            stmt.setString(1, status);
+//            stmt.setInt(2, bookingId);
+//
+//            return stmt.executeUpdate() > 0;
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//            return false;
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+
 
     // Utility method to map a ResultSet to a Booking object
     private Booking mapBooking(ResultSet rs) throws SQLException {

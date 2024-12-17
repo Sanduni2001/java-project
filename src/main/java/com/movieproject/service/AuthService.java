@@ -6,11 +6,15 @@ import com.movieproject.utils.DBConnection;
 
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AuthService {
 
     private final VerificationCodeService verificationCodeService = new VerificationCodeService();
     private final EmailService emailService = new EmailService();
+    private static final Logger LOGGER = Logger.getLogger(AuthService.class.getName());
+
 
     // Registers a new user
     public boolean registerUser(String username, String email,int mobile, String password) {
@@ -163,7 +167,7 @@ public class AuthService {
 
     // Gets the user ID using the email
     public int getUserIdByEmail(String email) {
-        String query = "SELECT userID FROM users WHERE email = ?";
+        String query = "SELECT userID FROM Users WHERE email = ?";
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, email);
@@ -182,15 +186,19 @@ public class AuthService {
     public boolean resetPassword(String email, String code, String newPassword) {
         int userId = getUserIdByEmail(email);
         if (userId == -1) {
-            return false; // User with the email doesn't exist
+            LOGGER.log(Level.WARNING, "No user found with email: {0}", email);
+            return false;
         }
 
         if (verificationCodeService.verifyCode(userId, code)) {
             verificationCodeService.markCodeAsUsed(userId, code);
             return updatePassword(userId, newPassword);
+        } else {
+            LOGGER.log(Level.INFO, "Verification code mismatch for user ID: {0}", userId);
+            return false;
         }
-        return false;
     }
+
 
     // Updates the user's password in the database
     private boolean updatePassword(int userId, String newPassword) {
@@ -201,9 +209,9 @@ public class AuthService {
             statement.setInt(2, userId);
             return statement.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed to update password for user ID: " + userId, e);
+            return false;
         }
-        return false;
     }
 
     // Utility method to generate a 6-digit verification code
