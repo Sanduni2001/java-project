@@ -17,36 +17,35 @@ import java.util.List;
 @WebServlet("/admin/manage-reviews")
 public class AdminReviewController extends HttpServlet {
 
-    private ReviewService reviewService=new ReviewService();
-    private UserService userService = new UserService();
+    private ReviewService reviewService;
+    private UserService userService;
 
     @Override
     public void init() throws ServletException {
         reviewService = new ReviewService();
+        userService = new UserService();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Fetch all reviews
-
         List<Review> reviews = reviewService.getAllReviews();
-        int userId = reviews.get(0).getUserId();
-        User user = userService.getUserById(userId);
 
         if (reviews == null || reviews.isEmpty()) {
             // Handle the case when no reviews are found
             request.setAttribute("message", "No reviews found.");
+            // Consider sending to a different page or updating the same page with the message
+            request.getRequestDispatcher("/views/admin/manage-reviews.jsp").forward(request, response);
         } else {
+            // Get the user details for the first review if reviews exist
+            User user = userService.getUserById(reviews.get(0).getUserId());
 
+            // Set reviews and user as a request attribute
+            request.setAttribute("reviews", reviews);
+            request.setAttribute("user", user);
 
-            // Set reviews as a request attribute
-        request.setAttribute("reviews", reviews);
-        request.setAttribute("user", user);
-
-
-        // Forward to admin review management JSP
-        request.getRequestDispatcher("/views/admin/manage-reviews.jsp").forward(request, response);
+            // Forward to admin review management JSP
+            request.getRequestDispatcher("/views/admin/manage-reviews.jsp").forward(request, response);
+        }
     }
-    }
-
 }

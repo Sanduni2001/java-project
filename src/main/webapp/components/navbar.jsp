@@ -8,7 +8,7 @@
 
             <!-- Logo Section -->
             <div class="flex-shrink-0 flex items-center">
-                <a href="${pageContext.request.contextPath}/index.jsp" class="flex items-center">
+                <a href="/" class="flex items-center">
                     <img src="${pageContext.request.contextPath}/assets/logos/logo.png" alt="Logo" class="h-12 w-auto">
                     <span class="ml-2 text-white text-lg font-semibold">ABC Cinema</span>
                 </a>

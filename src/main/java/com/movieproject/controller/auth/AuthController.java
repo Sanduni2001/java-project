@@ -37,7 +37,7 @@ public class AuthController extends HttpServlet {
                 forwardToPage(request, response, "/views/auth/signIn.jsp");
                 break;
             case "/auth/forgot-password":
-                forwardToPage(request, response, "/views/auth/forgot_password.jsp");
+                forwardToPage(request, response, "/views/auth/forget-password.jsp");
                 break;
             case "/auth/verify-email":
                 forwardToPage(request, response, "/views/auth/email_sent.jsp");

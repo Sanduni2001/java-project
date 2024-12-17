@@ -19,7 +19,6 @@
     <%-- Content Area --%>
     <div class="w-3/4 bg-white p-6 overflow-auto">
         <%-- Navbar --%>
-        <jsp:include page="/components/admin-navbar.jsp"/>
 
         <%-- Bookings Table Section --%>
         <div class="my-8">
