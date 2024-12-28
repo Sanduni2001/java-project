@@ -170,7 +170,7 @@ public class BookingServlet extends HttpServlet {
             throws IOException, ServletException {
 
         // Use your actual Stripe secret key
-        Stripe.apiKey = "sk_test_51Q242t01eUxv1eIMa00GJEpKpv4YPfg5Zp0DynxKQ85OneCl4mj44hfX1tus8of2eJThPqmRRX6VFDUK7L3igBRI00wN6TjlSm";
+        Stripe.apiKey = "";
 
         try {
             // Grab the movie name for the line item
