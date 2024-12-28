@@ -17,16 +17,27 @@
 <div class="container mx-auto px-4 py-8 flex-grow">
     <h1 class="text-3xl font-bold mb-6 text-center">Your Bookings</h1>
 
-    <!-- No Bookings -->
-    <c:if test="${empty bookings}">
+    <!-- If no bookingMovieList or it's empty, show message -->
+    <c:if test="${empty bookingMovieList}">
         <p class="text-center text-gray-600 text-lg">You have no bookings yet.</p>
     </c:if>
 
-    <!-- Bookings as Cards -->
-    <c:if test="${not empty bookings}">
+    <!-- Otherwise, display booking cards -->
+    <c:if test="${not empty bookingMovieList}">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <c:forEach var="booking" items="${bookings}">
+            <c:forEach var="bm" items="${bookingMovieList}">
+                <!-- Extract booking & movie from the map -->
+                <c:set var="booking" value="${bm.booking}" />
+                <c:set var="movie"   value="${bm.movie}" />
+
                 <div class="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                    <!-- If you have a movie image path -->
+                    <c:if test="${not empty movie.image}">
+                        <img class="w-full h-48 object-cover"
+                             src="${pageContext.request.contextPath}/DBImages/${movie.image}"
+                             alt="${movie.movieName}" />
+                    </c:if>
+
                     <div class="p-6">
                         <!-- Movie Title -->
                         <h2 class="text-xl font-bold text-gray-800 mb-2">
@@ -51,7 +62,7 @@
                             <strong>Seats:</strong> ${booking.numberOfSeats}
                         </p>
                         <p class="text-yellow-500 font-semibold text-lg mb-4">
-                            Total Price: $${booking.totalPrice}
+                            <strong>Total Price:</strong> $${booking.totalPrice}
                         </p>
 
                         <!-- Delete Button -->
@@ -60,7 +71,6 @@
                            class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded inline-block text-center">
                             Delete
                         </a>
-
                     </div>
                 </div>
             </c:forEach>

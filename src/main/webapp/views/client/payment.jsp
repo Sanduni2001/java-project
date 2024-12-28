@@ -26,7 +26,7 @@
 
         <!-- Payment Form -->
         <form class="mt-6 space-y-6" action="${pageContext.request.contextPath}/pay-now" method="post">
-            <!-- Email Input -->
+        <!-- Email Input -->
             <div>
                 <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <input

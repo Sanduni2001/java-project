@@ -1,100 +1,114 @@
 package com.movieproject.controller.client;
 
 import com.movieproject.model.*;
-import com.movieproject.service.BookingService;
-import com.movieproject.service.EmailService;
-import com.movieproject.service.MovieManagementService;
-import com.movieproject.service.UserService;
+import com.movieproject.service.*;
+import com.stripe.Stripe;
+import com.stripe.exception.StripeException;
+import com.stripe.model.checkout.Session;
+import com.stripe.param.checkout.SessionCreateParams;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-
+import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet("/booking")
 public class BookingServlet extends HttpServlet {
+
     private final MovieManagementService movieService = new MovieManagementService();
-    private final BookingService bookingService = new BookingService();
-    private  final EmailService emailService = new EmailService();
-    private  final UserService userService = new UserService();
+    private final BookingService bookingService       = new BookingService();
+    private final UserService userService             = new UserService();
+    private final EmailService emailService           = new EmailService();
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
         HttpSession session = request.getSession(false);
 
+        // User must be logged in
         if (session == null || session.getAttribute("userId") == null) {
-            response.sendRedirect("auth/login");
+            response.sendRedirect(request.getContextPath() + "/auth/login");
             return;
         }
-
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null) {
-            response.sendRedirect("auth/login");
+            response.sendRedirect(request.getContextPath() + "/auth/login");
             return;
         }
 
         String action = request.getParameter("action");
         if (action == null || action.isEmpty()) {
-            System.out.println("action is empty");
-            response.sendRedirect("error.jsp");
-            return;
-        }
-
-        switch (action) {
-            case "my-booking":
-                forwardToList(request, response, userId);
-                break;
-            case "delete":
-                deleteBooking(request, response);
-                break;
-            case "booking":
-                handleDetails(request, response);
-                break;
-            default:
-                response.sendRedirect("error.jsp");
-        }
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
-        if ("create".equals(action)) {
-            createBooking(request, response);
-        } else {
-            response.sendRedirect("error.jsp");
-        }
-    }
-
-    private void createBooking(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-
-        if (session == null || session.getAttribute("userId") == null) {
-            response.sendRedirect("views/auth/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/error.jsp");
             return;
         }
 
         try {
-            // Fetch parameters from request
-            int userId = (Integer) session.getAttribute("userId");
-            int movieId = Integer.parseInt(request.getParameter("movieId"));
-            String showDate = request.getParameter("showDate");
-            String showTime = request.getParameter("showTime");
+            switch (action) {
+                case "confirm":
+                    // Stripe success URL
+                    handleConfirmation(request, response);
+                    break;
+                case "cancel":
+                    // Stripe cancel URL
+                    handleCancellation(request, response);
+                    break;
+                case "my-booking":
+                    forwardToList(request, response, userId);
+                    break;
+                case "delete":
+                    deleteBooking(request, response);
+                    break;
+                case "booking":
+                    handleDetails(request, response);
+                    break;
+                default:
+                    response.sendRedirect(request.getContextPath() + "/error.jsp");
+            }
+        } catch (Exception e) {
+            log("Error handling GET request", e);
+            response.sendRedirect(request.getContextPath() + "/error.jsp");
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String action = request.getParameter("action");
+        if ("create".equals(action)) {
+            createBooking(request, response);
+        } else {
+            response.sendRedirect(request.getContextPath() + "/error.jsp");
+        }
+    }
+
+    /**
+     * 1) Create booking record with 'pending' status
+     * 2) Create a Stripe checkout session
+     * 3) Redirect user to Stripe's payment page
+     */
+    private void createBooking(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null) {
+            response.sendRedirect(request.getContextPath() + "/auth/login");
+            return;
+        }
+
+        try {
+            int userId        = (Integer) session.getAttribute("userId");
+            int movieId       = Integer.parseInt(request.getParameter("movieId"));
+            String showDate   = request.getParameter("showDate");
+            String showTime   = request.getParameter("showTime");
             int numberOfSeats = Integer.parseInt(request.getParameter("numberOfSeats"));
             double totalPrice = Double.parseDouble(request.getParameter("totalPrice"));
 
-            // Print inputs for debugging
-            System.out.println("UserId: " + userId);
-            System.out.println("MovieId: " + movieId);
-            System.out.println("ShowDate: " + showDate);
-            System.out.println("ShowTime: " + showTime);
-            System.out.println("NumberOfSeats: " + numberOfSeats);
-            System.out.println("TotalPrice: " + totalPrice);
-
-            // Create Booking object
+            // Create booking in 'pending' state
             Booking booking = new Booking();
             booking.setUserId(userId);
             booking.setMovieId(movieId);
@@ -102,166 +116,250 @@ public class BookingServlet extends HttpServlet {
             booking.setShowTime(showTime);
             booking.setNumberOfSeats(numberOfSeats);
             booking.setTotalPrice(totalPrice);
+            booking.setStatus("pending");
 
-            // Save booking
-            if (bookingService.createBooking(booking)) {
-                request.getSession().setAttribute("success", "Booking successful!");
-                User user = userService.getUserById(userId);
-                String email = user.getEmail();
-                Movie movie = movieService.getMovieById(movieId);
-                String movieName = movie.getMovieName();
-                emailService.sendBookingConfirmationEmail(email, movieName);
-                response.sendRedirect(request.getContextPath() + "/pay-now");
-            } else {
-                request.setAttribute("error", "Failed to create booking.");
-                request.getRequestDispatcher("/error.jsp").forward(request, response);
+            User user = userService.getUserById(userId);
+            Movie movie = movieService.getMovieById(movieId);
+
+            // Attempt to create Stripe session
+            boolean success = createStripeSession(request, response, booking, user, numberOfSeats, totalPrice/numberOfSeats);
+            if (success) {
+                // If session creation is successful, store booking in DB
+                if (bookingService.createBooking(booking)) {
+                    System.out.println("Booking created");
+
+                    // We can define a link for "View Booking" or something similar
+                    String bookingLink = "http://localhost:8080/movie-booking/booking?action=my-booking";
+
+
+                    emailService.sendBookingConfirmationEmail(
+                            user.getEmail(),
+                            movie.getMovieName(),
+                            showDate,
+                            showTime,
+                            numberOfSeats,
+                            totalPrice,
+                            bookingLink
+                    );
+
+                } else {
+                    request.setAttribute("error", "Failed to create booking record in DB.");
+                    request.getRequestDispatcher("error.jsp").forward(request, response);
+                }
             }
+
         } catch (NumberFormatException e) {
-            e.printStackTrace();
+            log("Invalid input format", e);
             request.setAttribute("error", "Invalid input. Please check your details.");
-            request.getRequestDispatcher("/error.jsp").forward(request, response);
+            request.getRequestDispatcher("error.jsp").forward(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
+            log("Error creating booking", e);
             request.setAttribute("error", "An unexpected error occurred. Please try again.");
-            request.getRequestDispatcher("/error.jsp").forward(request, response);
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+        }
+    }
+
+    /**
+     * Creates a Stripe checkout session and redirects user to the session URL.
+     *
+     * @return true if session creation & redirect succeed, false otherwise
+     */
+    private boolean createStripeSession(HttpServletRequest request, HttpServletResponse response,
+                                        Booking booking, User user,
+                                        int numberOfSeats, double totalPrice)
+            throws IOException, ServletException {
+
+        // Use your actual Stripe secret key
+        Stripe.apiKey = "sk_test_51Q242t01eUxv1eIMa00GJEpKpv4YPfg5Zp0DynxKQ85OneCl4mj44hfX1tus8of2eJThPqmRRX6VFDUK7L3igBRI00wN6TjlSm";
+
+        try {
+            // Grab the movie name for the line item
+            Movie movie = movieService.getMovieById(booking.getMovieId());
+            String movieName = (movie != null) ? movie.getMovieName() : "Movie Ticket";
+
+            // The successUrl should come back to this servlet with action=confirm & bookingId
+            String successUrl = String.format("%s://%s:%d%s/booking?action=confirm&bookingId=%d&session_id={CHECKOUT_SESSION_ID}",
+                    request.getScheme(), request.getServerName(), request.getServerPort(),
+                    request.getContextPath(), booking.getBookingId());
+
+            // The cancelUrl if user cancels or payment fails
+            String cancelUrl = String.format("%s://%s:%d%s/booking?action=cancel",
+                    request.getScheme(), request.getServerName(), request.getServerPort(),
+                    request.getContextPath());
+
+            // Build the session params
+            SessionCreateParams sessionParams = SessionCreateParams.builder()
+                    .setMode(SessionCreateParams.Mode.PAYMENT)
+                    .setSuccessUrl(successUrl)
+                    .setCancelUrl(cancelUrl)
+                    .addLineItem(
+                            SessionCreateParams.LineItem.builder()
+                                    .setQuantity((long) numberOfSeats)
+                                    .setPriceData(
+                                            SessionCreateParams.LineItem.PriceData.builder()
+                                                    .setCurrency("usd")
+                                                    .setUnitAmount((long) (totalPrice * 100)) // in cents
+                                                    .setProductData(
+                                                            SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                                                    .setName(movieName)
+                                                                    .setDescription("Booking for " + user.getUsername())
+                                                                    .build()
+                                                    )
+                                                    .build()
+                                    )
+                                    .build()
+                    )
+                    .build();
+
+            // Create session via Stripe API
+            Session stripeSession = Session.create(sessionParams);
+
+            // Optionally store the Stripe session ID in the booking object or DB
+            // booking.setStripeSessionId(stripeSession.getId());
+            // bookingService.updateBooking(booking);
+
+            // Redirect user to Stripe payment URL
+            response.sendRedirect(stripeSession.getUrl());
+            System.out.println("stripe ok");
+            return true;
+
+        } catch (StripeException e) {
+            log("Stripe API exception", e);
+            request.setAttribute("error", "Failed to initiate payment process with Stripe. " + e.toString());
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return false;
+        }
+    }
+
+    /**
+     * Called once Stripe payment is successful.
+     * We mark the booking as 'confirmed' in DB, show success page.
+     */
+    private void handleConfirmation(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+            // Show success page
+            request.setAttribute("message", "Booking confirmed successfully!");
+            request.getRequestDispatcher("/views/client/booking-success.jsp").forward(request, response);
+    }
+
+    /**
+     * If user cancels or payment fails, Stripe will redirect here.
+     */
+    private void handleCancellation(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.setAttribute("message", "Booking cancellation or payment was unsuccessful.");
+        request.getRequestDispatcher("/views/client/booking-failed.jsp").forward(request, response);
+    }
+
+    /**
+     * Show user’s existing bookings.
+     */
+    private void forwardToList(HttpServletRequest request, HttpServletResponse response, int userId)
+            throws ServletException, IOException {
+
+        List<Booking> bookings = bookingService.getAllBookingsByUserId(userId);
+        if (bookings == null || bookings.isEmpty()) {
+            request.setAttribute("message", "You have no bookings yet.");
+            request.getRequestDispatcher("/views/client/user-bookings.jsp").forward(request, response);
+        } else {
+
+            // We'll build a list of maps or a list of custom DTO objects
+            // each containing both booking and its movie.
+            List<Map<String, Object>> bookingMovieList = new ArrayList<>();
+
+            for (Booking b : bookings) {
+                // 1) For each booking, get the movie ID
+                int movieId = b.getMovieId();
+
+                // 2) Fetch the movie from DB
+                Movie movie = movieService.getMovieById(movieId);
+
+                // 3) Create a small map (or custom object) to hold them together
+                Map<String, Object> row = new HashMap<>();
+                row.put("booking", b);
+                row.put("movie", movie);
+
+                // 4) Add it to our list
+                bookingMovieList.add(row);
+            }
+
+            // Finally, pass this list to the JSP
+            request.setAttribute("bookingMovieList", bookingMovieList);
+
+            // Forward to user-bookings.jsp
+            request.getRequestDispatcher("/views/client/user-bookings.jsp").forward(request, response);
         }
     }
 
 
-    private void forwardToList(HttpServletRequest request, HttpServletResponse response, int userId) throws ServletException, IOException {
-        // Fetch user bookings
-        List<Booking> bookings = bookingService.getAllBookingsByUserId(userId);
-
-        // Check if the bookings list is empty
-        if (bookings == null || bookings.isEmpty()) {
-            // Set an attribute to display a message on the JSP
-            request.setAttribute("message", "You have no bookings yet.");
-            // Forward to the bookings JSP without any bookings
-            request.getRequestDispatcher("/views/client/user-bookings.jsp").forward(request, response);
+    /**
+     * Allows user to delete a booking if you have such a feature.
+     */
+    private void deleteBooking(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null) {
+            response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
             return;
         }
 
-        // Get the first booking's movie details
-        int movieId = bookings.get(0).getMovieId();
-        Movie movie = movieService.getMovieById(movieId);
+        try {
+            int userId = (Integer) session.getAttribute("userId");
+            int bookingId = Integer.parseInt(request.getParameter("bookingId"));
 
-        // Pass data to the JSP
-        request.setAttribute("bookings", bookings);
-        request.setAttribute("movie", movie);
-        request.getRequestDispatcher("/views/client/user-bookings.jsp").forward(request, response);
+            if (bookingService.deleteBooking(bookingId)) {
+                User user = userService.getUserById(userId);
+                // Optionally send cancellation email or other logic
+                emailService.sendBookingCancellationEmail(user.getEmail(),
+                        "Booking Cancellation",
+                        "Your booking has been canceled successfully.");
+
+                response.sendRedirect(request.getContextPath() + "/booking?action=my-booking&message=Booking+deleted+successfully");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/error.jsp?message=Unable+to+delete+booking");
+            }
+        } catch (NumberFormatException e) {
+            log("NumberFormatException: Invalid Booking ID Format", e);
+            response.sendRedirect(request.getContextPath() + "/error.jsp?message=Invalid+Booking+ID+Format");
+        } catch (Exception e) {
+            log("Error deleting booking", e);
+            throw new RuntimeException(e);
+        }
     }
 
-
-    private void handleDetails(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    /**
+     * Show details page for a particular movie/time
+     */
+    private void handleDetails(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         try {
-            int movieId = Integer.parseInt(request.getParameter("movieId"));
+            int movieId    = Integer.parseInt(request.getParameter("movieId"));
             int showTimeId = Integer.parseInt(request.getParameter("showTimeId"));
             int showDateId = Integer.parseInt(request.getParameter("showDateId"));
 
-            System.out.println("Movie ID: " + movieId);
-            System.out.println("Show Time ID: " + showTimeId);
-            System.out.println("Show Date ID: " + showDateId);
+            Movie movie    = movieService.getMovieById(movieId);
+            ShowTime st    = movieService.getShowTimeById(showTimeId);
+            ShowDate date  = movieService.getShowDateById(showDateId);
 
-            Movie movie = movieService.getMovieById(movieId);
-            ShowTime showTime = movieService.getShowTimeById(showTimeId);
-            ShowDate date = movieService.getShowDateById(showDateId);
-
-            if (movie == null || showTime == null) {
-                request.setAttribute("error", "Movie or Show Time not found.");
+            if (movie == null || st == null || date == null) {
+                request.setAttribute("error", "Movie, Show Time or Show Date not found.");
                 request.getRequestDispatcher("/error.jsp").forward(request, response);
                 return;
             }
-
-            if (date == null) {
-                request.setAttribute("error", "Show Date not found.");
-                request.getRequestDispatcher("/error.jsp").forward(request, response);
-                return;
-            }
-
-            System.out.println("Fetched Movie: " + movie.getMovieName());
-            System.out.println("Fetched Show Time: " + showTime.getShowTime());
-            System.out.println("Fetched Show Date: " + date.getShowDate());
 
             request.setAttribute("movie", movie);
             request.setAttribute("showDate", date);
-            request.setAttribute("showTime", showTime);
+            request.setAttribute("showTime", st);
             request.getRequestDispatcher("/views/client/booking.jsp").forward(request, response);
 
         } catch (NumberFormatException e) {
-            System.out.println("NumberFormatException: Invalid input for ID.");
+            log("NumberFormatException: Invalid input for ID", e);
             request.setAttribute("error", "Invalid ID format.");
-            request.getRequestDispatcher("/error.jsp").forward(request, response);
+            try {
+                request.getRequestDispatcher("/error.jsp").forward(request, response);
+            } catch (ServletException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
-
-    private void deleteBooking(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        HttpSession session = request.getSession(false);
-
-        try {
-            // Step 1: Verify session and user ID
-            if (session == null || session.getAttribute("userId") == null) {
-                response.sendRedirect(request.getContextPath() + "/auth/login.jsp");
-                return;
-            }
-
-            int userId = (Integer) session.getAttribute("userId");
-            System.out.println("User ID from session: " + userId);
-
-            // Step 2: Retrieve and validate the booking ID from request
-            String bookingIdParam = request.getParameter("bookingId");
-            if (bookingIdParam == null || bookingIdParam.isEmpty()) {
-                response.sendRedirect(request.getContextPath() + "/error.jsp?message=Invalid Booking ID");
-                return;
-            }
-
-            int bookingId = Integer.parseInt(bookingIdParam);
-            System.out.println("Booking ID to delete: " + bookingId);
-
-            // Step 3: Fetch booking details before deletion
-            Booking booking = bookingService.getBookingById(bookingId);
-            if (booking == null) {
-                System.out.println("Booking not found for ID: " + bookingId);
-                response.sendRedirect(request.getContextPath() + "/error.jsp?message=Booking not found");
-                return;
-            }
-
-            // Fetch movie details
-            Movie movie = movieService.getMovieById(booking.getMovieId());
-            String movieName = (movie != null) ? movie.getMovieName() : "Unknown Movie";
-            System.out.println("Movie Name: " + movieName);
-
-            // Step 4: Delete the booking
-            if (bookingService.deleteBooking(bookingId)) {
-                // Fetch user email
-                User user = userService.getUserById(userId);
-                if (user == null) {
-                    System.out.println("User not found for ID: " + userId);
-                    response.sendRedirect(request.getContextPath() + "/error.jsp?message=User not found");
-                    return;
-                }
-
-                String email = user.getEmail();
-                System.out.println("User Email: " + email);
-
-                // Step 5: Send cancellation email
-                emailService.sendBookingCancellationEmail(email, movieName);
-                System.out.println("Booking cancellation email sent successfully to " + email);
-
-                // Redirect to "my-booking" page
-                response.sendRedirect(request.getContextPath() + "/booking?action=my-booking&message=Booking deleted successfully");
-            } else {
-                System.out.println("Failed to delete booking with ID: " + bookingId);
-                response.sendRedirect(request.getContextPath() + "/error.jsp?message=Unable to delete booking");
-            }
-
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid Booking ID format.");
-            response.sendRedirect(request.getContextPath() + "/error.jsp?message=Invalid Booking ID Format");
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/error.jsp?message=Unexpected Error Occurred");
-        }
-    }
-
-
 }

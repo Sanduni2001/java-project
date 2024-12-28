@@ -83,7 +83,7 @@ public class MovieManagementController extends HttpServlet {
         dispatcher.forward(request, response);
     }
 
-    private static final String UPLOAD_PATH = "D:/Workspace/project/java-project/src/main/webapp/DBImages";
+    private static final String UPLOAD_PATH = "/Users/kavindu/Developer/Projects/movie-booking/src/main/webapp/DBImages/";
 
     private void addMovie(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String movieName = request.getParameter("movieName");

@@ -1,4 +1,4 @@
-package com.movieproject.controller.client;
+package com.movieproject.controller;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

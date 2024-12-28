@@ -59,6 +59,17 @@
       <version>2.0.0</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.stripe</groupId>
+      <artifactId>stripe-java</artifactId>
+      <version>28.1.0</version>
+    </dependency>
+      <dependency>
+        <groupId>io.github.cdimascio</groupId>
+        <artifactId>dotenv-java</artifactId>
+        <version>2.3.1</version>
+      </dependency>
+
 
   </dependencies>
 

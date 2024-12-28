@@ -23,10 +23,7 @@
                 <a href="${pageContext.request.contextPath}/admin/manage-reviews"
                    class="block py-2 px-4 text-lg font-semibold hover:bg-gray-700 rounded-lg">Reviews</a>
             </li>
-            <li>
-                <a href="#" onclick="loadPage('admin-comingsoon.jsp')"
-                   class="block py-2 px-4 text-lg font-semibold hover:bg-gray-700 rounded-lg">Payments</a>
-            </li>
+
         </ul>
     </div>
     <div class="p-4">

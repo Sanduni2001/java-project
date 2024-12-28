@@ -18,15 +18,40 @@ public class EmailService {
         EmailUtility.sendEmail(toAddress, subject, message);
     }
 
-    // Method to send booking confirmation email
-    public void sendBookingConfirmationEmail(String toAddress, String bookingDetails) throws Exception {
-        String subject = "Booking Confirmation";
-        String message = getBookingEmailContent("Your Booking Confirmation", bookingDetails, "View Booking", "http://localhost:8080/demo/view-booking.html");
-        EmailUtility.sendEmail(toAddress, subject, message);
+    public void sendBookingConfirmationEmail(String toAddress,
+                                             String movieName,
+                                             String showDate,
+                                             String showTime,
+                                             int numberOfSeats,
+                                             double totalPrice,
+                                             String bookingLink) throws Exception
+    {
+        // Subject line
+        String subject = "Your Booking Confirmation for " + movieName;
+
+        // Build details in HTML or simple line-break style
+        // For example, we can use <br/> tags or separate paragraphs:
+        String details = ""
+                + "<strong>Movie Name:</strong> " + movieName + "<br/>"
+                + "<strong>Show Date:</strong> " + showDate + "<br/>"
+                + "<strong>Show Time:</strong> " + showTime + "<br/>"
+                + "<strong>Seats:</strong> " + numberOfSeats + "<br/>"
+                + "<strong>Total Price:</strong> $" + totalPrice + "<br/>";
+
+        // Construct the final HTML
+        String messageHtml = getBookingEmailContent(
+                "Your Booking Confirmation",
+                details,
+                "View Booking",
+                bookingLink
+        );
+
+        // Use your EmailUtility (or your mail library) to send HTML email
+        EmailUtility.sendEmail(toAddress, subject, messageHtml);
     }
 
     // Method to send booking cancellation email
-    public void sendBookingCancellationEmail(String toAddress, String bookingDetails) throws Exception {
+    public void sendBookingCancellationEmail(String toAddress, String bookingDetails, String s) throws Exception {
         String subject = "Booking Cancellation";
         String message = getCancellationEmailContent("Your Booking Cancellation", bookingDetails, "Contact Support", "http://localhost:8080/demo/contact-support.html");
         EmailUtility.sendEmail(toAddress, subject, message);
@@ -56,7 +81,8 @@ public class EmailService {
     }
 
     // Helper method for booking email content
-    private String getBookingEmailContent(String title, String details, String actionText, String actionLink) {
+    private String getBookingEmailContent(String title, String details,
+                                          String actionText, String actionLink) {
         return "<!DOCTYPE html>"
                 + "<html>"
                 + "<head>" + styleSheet() + "</head>"
@@ -67,7 +93,9 @@ public class EmailService {
                 + "            <p>Hello,</p>"
                 + "            <p>Thank you for your booking. Here are your booking details:</p>"
                 + "            <p>" + details + "</p>"
-                + "            <a href='" + actionLink + "'>" + actionText + "</a>"
+                + "            <p>"
+                + "                <a href='" + actionLink + "'>" + actionText + "</a>"
+                + "            </p>"
                 + "        </div>"
                 + "        <div class='email-footer'>"
                 + "            &copy; 2024 Your Company. All rights reserved."
